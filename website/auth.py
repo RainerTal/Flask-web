@@ -13,3 +13,7 @@ def logout():
 @auth.route('/sign-up')
 def signup():
     return('<p>Sign Up</p>')
+
+@auth.route("/stock")
+def stock():
+    return('<p>Stock</p>')
