@@ -3,6 +3,7 @@ from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 import bcrypt
 from . import db
+from flask_login import login_user, login_required, logout_user, current_user
 
 auth = Blueprint('auth', __name__)
 
@@ -16,6 +17,7 @@ def login():
         if user:
             if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
                 flash('Logged in successfully', category='success')
+                login_user(user, remember=True)
                 return redirect(url_for('views.home'))
             else:
                 flash('Incorrect password', category='error')
@@ -23,11 +25,13 @@ def login():
             flash('That email does not exist', category='error')
 
     data = request.form
-    return render_template("login.html", boolean=True)
+    return render_template("login.html", user=current_user)
 
 @auth.route('/logout')
+@login_required
 def logout():
-    return('<p>Logout</p>')
+    logout_user()
+    return redirect(url_for('auth.login'))
 
 @auth.route('/sign-up', methods=["GET", "POST"])
 def signup():
@@ -51,14 +55,15 @@ def signup():
             new_user = User(email=email, first_name=first_name, password=hashed_password.decode('utf-8'))
             db.session.add(new_user)
             db.session.commit()
+            login_user(user, remember=True)
             flash("Account created", category="success")
             return redirect(url_for('views.home'))
         
         def verify_user_password(stored_hash, password):
             return bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
             
-    return render_template("sign_up.html")
+    return render_template("sign_up.html", user=current_user)
 
 @auth.route("/stock")
 def stock():
-    return render_template("stock.html")
+    return render_template("stock.html", user = current_user)
