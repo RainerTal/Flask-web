@@ -1,0 +1,28 @@
+body {
+    background-color: #242526;
+}
+
+h1 {
+    color: #E4E6EB;
+}
+
+#login, #logout, #sign-up, #stock, #home {
+    color: #E4E6EB;
+}
+
+#SvgjsTspan2916 {
+    color: #E4E6EB;
+}
+
+text {
+    fill: #E4E6EB;
+}
+
+.list-group-item {
+    background-color: #242526;
+    color: #E4E6EB;
+}
+
+#cross {
+    color: #E4E6EB;
+}

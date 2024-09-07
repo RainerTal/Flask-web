@@ -7,7 +7,7 @@
   <li class="list-group-item">
     {{ note.data }}
     <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true" id="cross">&times;</span>
     </button>
   </li>
   {% endfor %}
@@ -19,4 +19,27 @@
     <button type="submit" class="btn btn-primary">Add Note</button>
   </div>
 </form>
+
+<br />
+<br />
+
+<h1 align="center">Close values</h1>
+<ul class="list-group list-group-flush" id="close_values">
+  {% for close in user.close_values %}
+  <li class="list-group-item">
+    {{ close.data }}
+    <button type="button" class="close" onClick="deleteCloseValue({{ close.id }})">
+        <span aria-hidden="true" id="cross">&times;</span>
+    </button>
+  </li>
+  {% endfor %}
+</ul>
+<form method="POST">
+  <input name="close" id="close" class="form-control" step="any" required>
+  <br />
+  <div align="center">
+    <button type="submit" class="btn btn-primary">Add Close value</button>
+  </div>
+</form>
+
 {% endblock %}

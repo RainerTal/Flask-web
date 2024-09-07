@@ -1,10 +1,33 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
-from sqlalchemy import Numeric
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(150), unique=True)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class CloseValue(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.Float, unique=True)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class OpenValue(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.Float, unique=True)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class High(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.Float, unique=True)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class Low(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.Float, unique=True)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -14,5 +37,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     notes = db.relationship('Note')
+    close_values = db.relationship('CloseValue')
+    open_values = db.relationship('OpenValue')
+    high = db.relationship('High')
+    low = db.relationship('Low')
 
 
