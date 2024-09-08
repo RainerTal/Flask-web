@@ -22,17 +22,35 @@ def home():
                 flash('Note added!', category='success')
             else:
                 flash('Value insert requires at least 1 character')
-                
+
+        open_v = request.form.get('open_v')
         close = request.form.get('close')
-        if close:
+        high = request.form.get('high')
+        low = request.form.get('low')
+
+        if open_v and close and high and low:
             try:
-                close_value = float(close)  # Try converting to float
-                new_close = CloseValue(data=close_value, user_id=current_user.id)
-                db.session.add(new_close)
+                open_value = float(open_v)
+                close_value = float(close)
+                high_value = float(high)
+                low_value = float(low)
+
+                new_open_value = OpenValue(data=open_value, user_id=current_user.id)
+                new_close_value = CloseValue(data=close_value, user_id=current_user.id)
+                new_high_value = High(data=high_value, user_id=current_user.id)
+                new_low_value = Low(data=low_value, user_id=current_user.id)
+
+                db.session.add(new_open_value)
+                db.session.add(new_close_value)
+                db.session.add(new_high_value)
+                db.session.add(new_low_value)
                 db.session.commit()
-                flash('Close value added!', category='success')
+            
+                flash('Values added successfully!', category='success')
             except ValueError:
-                flash('Value is not a valid float')
+                flash('One or more values are not valid numbers', category='error')
+        else:
+            flash('Please fill in all fields', category='error')
 
     return render_template("home.html", user=current_user)
 
@@ -47,9 +65,75 @@ def delete_note():
             db.session.commit()
     return jsonify({})
 
+@views.route('/delete-close', methods=['POST'])
+def delete_close():
+    close = json.loads(request.data)
+    closeId = close['closeId']
+    close = CloseValue.query.get(closeId)
+    if close:
+        if close.user_id == current_user.id:
+            db.session.delete(close)
+            db.session.commit()
+    return jsonify({})
+
+@views.route('/delete-open_v', methods=['POST'])
+def delete_open_v():
+    open_v = json.loads(request.data)
+    open_vId = open_v['open_vId']
+    open_v = OpenValue.query.get(open_vId)
+    if open_v:
+        if open_v.user_id == current_user.id:
+            db.session.delete(open_v)
+            db.session.commit()
+    return jsonify({})
+
+@views.route('delete-high', methods=['POST'])
+def delete_high():
+    high = json.loads(request.data)
+    highId = high['highId']
+    high = High.query.get(highId)
+    if high:
+        if high.user_id == current_user.id:
+            db.session.delete(high)
+            db.session.commit()
+    return jsonify({})
+
+@views.route('delete-low', methods=['POST'])
+def delete_low():
+    low = json.loads(request.data)
+    lowId = low['lowId']
+    low = Low.query.get(lowId)
+    if low:
+        if low.user_id == current_user.id:
+            db.session.delete(low)
+            db.session.commit()
+    return jsonify({})
 
 
 @views.route('/stock')
 @login_required
 def stock():
     return render_template('stock.html', user = current_user)
+
+@views.route('/stock', methods=['GET'])
+def get_candlestick_data():
+    open_values = OpenValue.query.filter_by(user_id=current_user.id).all()
+    close_values = CloseValue.query.filter_by(user_id=current_user.id).all()
+    highs = High.query.filter_by(user_id=current_user.id).all()
+    lows = Low.query.filter_by(user_id=current_user.id).all()
+    
+    data_dict = {}
+    
+    for open_v, close_v, high, low in zip(open_values, close_values, highs, lows):
+        timestamp = open_v.date.isoformat()
+        data_dict[timestamp] = {
+            'open': open_v.data,
+            'close': close_v.data,
+            'high': high.data,
+            'low': low.data
+        }
+
+    data = [{'x': timestamp, 'y': [values['open'], values['high'], values['low'], values['close']]}
+            for timestamp, values in sorted(data_dict.items())]
+    
+    return jsonify(data)

@@ -9,25 +9,25 @@ class Note(db.Model):
 
 class CloseValue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float, unique=True)
+    data = db.Column(db.Float)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class OpenValue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float, unique=True)
+    data = db.Column(db.Float)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class High(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float, unique=True)
+    data = db.Column(db.Float)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Low(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float, unique=True)
+    data = db.Column(db.Float)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -39,7 +39,7 @@ class User(db.Model, UserMixin):
     notes = db.relationship('Note')
     close_values = db.relationship('CloseValue')
     open_values = db.relationship('OpenValue')
-    high = db.relationship('High')
-    low = db.relationship('Low')
+    highs = db.relationship('High')
+    lows = db.relationship('Low')
 
 
