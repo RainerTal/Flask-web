@@ -1,13 +1,11 @@
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
-from .models import Note, CloseValue, OpenValue, High, Low
+from .models import Note, CloseValue, OpenValue, High, Low, User
 from . import db
 import json
-from decimal import Decimal
+from datetime import datetime
 
 views = Blueprint('views', __name__)
-
-
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
@@ -115,25 +113,26 @@ def delete_low():
 def stock():
     return render_template('stock.html', user = current_user)
 
-@views.route('/stock', methods=['GET'])
-def get_candlestick_data():
+@views.route('/chart-data', methods=['GET'])
+def chart_data():
     open_values = OpenValue.query.filter_by(user_id=current_user.id).all()
+    high_values = High.query.filter_by(user_id=current_user.id).all()
+    low_values = Low.query.filter_by(user_id=current_user.id).all()
     close_values = CloseValue.query.filter_by(user_id=current_user.id).all()
-    highs = High.query.filter_by(user_id=current_user.id).all()
-    lows = Low.query.filter_by(user_id=current_user.id).all()
-    
-    data_dict = {}
-    
-    for open_v, close_v, high, low in zip(open_values, close_values, highs, lows):
-        timestamp = open_v.date.isoformat()
-        data_dict[timestamp] = {
-            'open': open_v.data,
-            'close': close_v.data,
-            'high': high.data,
-            'low': low.data
-        }
 
-    data = [{'x': timestamp, 'y': [values['open'], values['high'], values['low'], values['close']]}
-            for timestamp, values in sorted(data_dict.items())]
-    
+
+    num_values = min(len(open_values), len(high_values), len(low_values), len(close_values))
+
+    data = []
+    for i in range(num_values):
+        data.append({
+            'x': int(close_values[i].date.timestamp() * 1000),  
+            'y': [
+                open_values[i].data,
+                high_values[i].data,
+                low_values[i].data,
+                close_values[i].data
+            ]
+        })
+
     return jsonify(data)
