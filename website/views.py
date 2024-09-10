@@ -11,44 +11,49 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     if request.method == 'POST':
-        note = request.form.get('note')
-        if note:
-            if len(note) > 0:
-                new_note = Note(data=note, user_id=current_user.id)
-                db.session.add(new_note)
-                db.session.commit()
-                flash('Note added!', category='success')
+        form_type = request.form.get('form_type')
+        if form_type == 'note_form':
+            note = request.form.get('note')
+            if note:
+                if len(note) > 0:
+                    new_note = Note(data=note, user_id=current_user.id)
+                    db.session.add(new_note)
+                    db.session.commit()
+                    flash('Note added!', category='success')
+                else:
+                    flash('Value insert requires at least 1 character')
+
+        elif form_type == 'values_form':
+            open_v = request.form.get('open_v')
+            close = request.form.get('close')
+            high = request.form.get('high')
+            low = request.form.get('low')
+            if high >= open_v and low <= close or high >= close and low <= open_v:
+                if open_v and close and high and low:
+                    try:
+                        open_value = float(open_v)
+                        close_value = float(close)
+                        high_value = float(high)
+                        low_value = float(low)
+
+                        new_open_value = OpenValue(data=open_value, user_id=current_user.id)               
+                        new_close_value = CloseValue(data=close_value, user_id=current_user.id)
+                        new_high_value = High(data=high_value, user_id=current_user.id)
+                        new_low_value = Low(data=low_value, user_id=current_user.id)
+
+                        db.session.add(new_open_value)
+                        db.session.add(new_close_value)
+                        db.session.add(new_high_value)
+                        db.session.add(new_low_value)
+                        db.session.commit()
+                            
+                        flash('Values added successfully!', category='success')
+                    except ValueError:
+                        flash('One or more values are not valid numbers', category='error')            
+                else:
+                    flash('Please fill in all fields', category='error')
             else:
-                flash('Value insert requires at least 1 character')
-
-        open_v = request.form.get('open_v')
-        close = request.form.get('close')
-        high = request.form.get('high')
-        low = request.form.get('low')
-
-        if open_v and close and high and low:
-            try:
-                open_value = float(open_v)
-                close_value = float(close)
-                high_value = float(high)
-                low_value = float(low)
-
-                new_open_value = OpenValue(data=open_value, user_id=current_user.id)
-                new_close_value = CloseValue(data=close_value, user_id=current_user.id)
-                new_high_value = High(data=high_value, user_id=current_user.id)
-                new_low_value = Low(data=low_value, user_id=current_user.id)
-
-                db.session.add(new_open_value)
-                db.session.add(new_close_value)
-                db.session.add(new_high_value)
-                db.session.add(new_low_value)
-                db.session.commit()
-            
-                flash('Values added successfully!', category='success')
-            except ValueError:
-                flash('One or more values are not valid numbers', category='error')
-        else:
-            flash('Please fill in all fields', category='error')
+                flash('High and low values can not be in between open and close values', category='error')
 
     return render_template("home.html", user=current_user)
 
@@ -63,50 +68,37 @@ def delete_note():
             db.session.commit()
     return jsonify({})
 
-@views.route('/delete-close', methods=['POST'])
-def delete_close():
-    close = json.loads(request.data)
-    closeId = close['closeId']
-    close = CloseValue.query.get(closeId)
-    if close:
-        if close.user_id == current_user.id:
-            db.session.delete(close)
-            db.session.commit()
-    return jsonify({})
+@views.route('/delete-values', methods=['POST'])
+@login_required
+def delete_values():
+    data = json.loads(request.data)
 
-@views.route('/delete-open_v', methods=['POST'])
-def delete_open_v():
-    open_v = json.loads(request.data)
-    open_vId = open_v['open_vId']
-    open_v = OpenValue.query.get(open_vId)
-    if open_v:
-        if open_v.user_id == current_user.id:
+    open_vId = data['open_vId']
+    if open_vId:
+        open_v = OpenValue.query.get(open_vId)
+        if open_v and open_v.user_id == current_user.id:
             db.session.delete(open_v)
-            db.session.commit()
-    return jsonify({})
 
-@views.route('delete-high', methods=['POST'])
-def delete_high():
-    high = json.loads(request.data)
-    highId = high['highId']
-    high = High.query.get(highId)
-    if high:
-        if high.user_id == current_user.id:
+    closeId = data['closeId']
+    if closeId:
+        close = CloseValue.query.get(closeId)
+        if close and close.user_id == current_user.id:
+            db.session.delete(close)
+
+    highId = data['highId']
+    if highId:
+        high = High.query.get(highId)
+        if high and high.user_id == current_user.id:
             db.session.delete(high)
-            db.session.commit()
-    return jsonify({})
 
-@views.route('delete-low', methods=['POST'])
-def delete_low():
-    low = json.loads(request.data)
-    lowId = low['lowId']
-    low = Low.query.get(lowId)
-    if low:
-        if low.user_id == current_user.id:
+    lowId = data['lowId']
+    if lowId:
+        low = Low.query.get(lowId)
+        if low and low.user_id == current_user.id:
             db.session.delete(low)
-            db.session.commit()
-    return jsonify({})
 
+    db.session.commit()  
+    return jsonify({})
 
 @views.route('/stock')
 @login_required

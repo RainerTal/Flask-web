@@ -7,37 +7,15 @@ function deleteNote(noteId) {
   });
 }
 
-function deleteCloseValue(closeId) {
-  fetch("/delete-close", {
+function deleteValues(open_vId, closeId, highId, lowId) {
+  fetch("/delete-values", {
     method: "POST",
-    body: JSON.stringify({ closeId: closeId }),
-  }).then((_res) => {
-    window.location.href = "/";
-  });
-}
-
-function deleteOpenValue(open_vId) {
-  fetch("/delete-open_v", {
-    method: "POST",
-    body: JSON.stringify({ open_vId: open_vId }),
-  }).then((_res) => {
-    window.location.href = "/";
-  });
-}
-
-function deleteHigh(highId) {
-  fetch("/delete-high", {
-    method: "POST",
-    body: JSON.stringify({ highId: highId }),
-  }).then((_res) => {
-    window.location.href = "/";
-  });
-}
-
-function deleteLow(lowId) {
-  fetch("/delete-low", {
-    method: "POST",
-    body: JSON.stringify({ lowId: lowId }),
+    body: JSON.stringify({
+       open_vId: open_vId,
+       closeId: closeId,
+       highId: highId,
+       lowId: lowId
+      }),
   }).then((_res) => {
     window.location.href = "/";
   });
