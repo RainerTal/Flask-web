@@ -1,99 +1,97 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<h1 align="center">Notes</h1>
+<h3 align="center">Drink names (enter 1 at a time)</h3>
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
-  <li class="list-group-item">
-    {{ note.data }} <small class="text-muted">{{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <span>{{ note.data }} <small class="text-muted">{{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
     <button type="button" class="close" onClick="deleteNote({{ note.id }})">
         <span aria-hidden="true" id="cross">&times;</span>
     </button>
   </li>
   {% endfor %}
 </ul>
-<form method="POST">
-  <input name="note" id="note" class="form-control" step="any" required>
-  <br />
-  <div align="center">
-    <button type="submit" class="btn btn-primary">Add note</button>
+
+<form method="POST" class="mb-4">
+  <input name="note" id="note" class="form-control mb-2" placeholder="Add new drink..." required>
+  <div class="d-flex justify-content-center">
+    <button type="submit" class="btn btn-primary">Add drink name</button>
+    <input type="hidden" name="form_type" value="note_form">
   </div>
 </form>
 
 <form method="POST">
-<br />
-<br />
+<h1 align="center">Values</h1>
 
-<h1 align="center">Open values</h1>
-<ul class="list-group list-group-flush" id="open_values">
-  {% for open_v in user.open_values %}
-  <li class="list-group-item">
-    {{ open_v.data }} <small class="text-muted">{{ open_v.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-    <button type="button" class="close" onClick="deleteOpenValue({{ open_v.id }})">
-        <span aria-hidden="true" id="cross">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
+<div class="row">
+  <div class="col">
+    <h3 align="center">Open values</h3>
+    <ul class="list-group list-group-flush" id="open_values">
+      {% for open_v in user.open_values %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ open_v.data }} <small class="text-muted">{{ open_v.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+        <button type="button" class="close" data-id="{{ open_v.id }}" onClick="deleteLastValues()">
+            <span aria-hidden="true" id="cross">&times;</span>
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    <input name="open_v" id="open_v" class="form-control mb-3" placeholder="Add open value..." required>
+  </div>
 
-  <input name="open_v" id="open_v" class="form-control" step="any" required>
+  <div class="col">
+    <h3 align="center">Close values</h3>
+    <ul class="list-group list-group-flush" id="close_values">
+      {% for close in user.close_values %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ close.data }} <small class="text-muted">{{ close.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+        <button type="button" class="close" data-id="{{ close.id }}" onClick="deleteLastValues()">
+            <span aria-hidden="true" id="cross">&times;</span>
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    <input name="close" id="close" class="form-control mb-3" placeholder="Add close value..." required>
+  </div>
+</div>
 
-<br />
-<br />
+<div class="row">
+  <div class="col">
+    <h3 align="center">High values</h3>
+    <ul class="list-group list-group-flush" id="highs">
+      {% for high in user.highs %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ high.data }} <small class="text-muted">{{ high.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+        <button type="button" class="close" data-id="{{ high.id }}" onClick="deleteLastValues()">
+            <span aria-hidden="true" id="cross">&times;</span>
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    <input name="high" id="high" class="form-control mb-3" placeholder="Add high value..." required>
+  </div>
 
-<h1 align="center">Close values</h1>
-<ul class="list-group list-group-flush" id="close_values">
-  {% for close in user.close_values %}
-  <li class="list-group-item">
-    {{ close.data }} <small class="text-muted">{{ close.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-    <button type="button" class="close" onClick="deleteCloseValue({{ close.id }})">
-        <span aria-hidden="true" id="cross">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
+  <div class="col">
+    <h3 align="center">Low values</h3>
+    <ul class="list-group list-group-flush" id="lows">
+      {% for low in user.lows %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ low.data }} <small class="text-muted">{{ low.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+        <button type="button" class="close" data-id="{{ low.id }}" onClick="deleteLastValues()">
+            <span aria-hidden="true" id="cross">&times;</span>
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    <input name="low" id="low" class="form-control mb-3" placeholder="Add low value..." required>
+  </div>
+</div>
 
-  <input name="close" id="close" class="form-control" step="any" required>
-  
-<br />
-<br />
 
-<h1 align="center">High values</h1>
-<ul class="list-group list-group-flush" id="highs">
-  {% for high in user.highs %}
-  <li class="list-group-item">
-    {{ high.data }} <small class="text-muted">{{ high.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-    <button type="button" class="close" onClick="deleteHigh({{ high.id }})">
-        <span aria-hidden="true" id="cross">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
-
-  <input name="high" id="high" class="form-control" step="any" required>
-
-<br />
-<br />
-
-<h1 align="center">Low values</h1>
-<ul class="list-group list-group-flush" id="lows">
-  {% for low in user.lows %}
-  <li class="list-group-item">
-    {{ low.data }} <small class="text-muted">{{ low.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-    <button type="button" class="close" onClick="deleteLow({{ low.id }})">
-        <span aria-hidden="true" id="cross">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
-
-  <input name="low" id="low" class="form-control" step="any" required>
-
-<br />
-<br />
-
-<div align="center">
+<div class="d-flex justify-content-center mt-3">
   <button type="submit" class="btn btn-primary">Add values</button>
 </div>
+<input type="hidden" name="form_type" value="values_form">
 </form>
 {% endblock %}
