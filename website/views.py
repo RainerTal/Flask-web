@@ -1,9 +1,8 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Note, CloseValue, OpenValue, High, Low, User
+from .models import Note, CloseValue, OpenValue, High, Low
 from . import db
 import json
-from datetime import datetime
 
 views = Blueprint('views', __name__)
 
@@ -22,13 +21,15 @@ def home():
                     flash('Note added!', category='success')
                 else:
                     flash('Value insert requires at least 1 character')
-
-        elif form_type == 'values_form':
+        
+                return redirect(url_for('views.home'))
+            
+        if form_type == 'values_form':
             open_v = request.form.get('open_v')
             close = request.form.get('close')
             high = request.form.get('high')
             low = request.form.get('low')
-            if high >= open_v and low <= close or high >= close and low <= open_v:
+            if not (min(open_v, close) <= high <= max(open_v, close)) and not (min(open_v, close) <= low <= max(open_v, close)):
                 if open_v and close and high and low:
                     try:
                         open_value = float(open_v)
@@ -49,11 +50,14 @@ def home():
                             
                         flash('Values added successfully!', category='success')
                     except ValueError:
-                        flash('One or more values are not valid numbers', category='error')            
+                        flash('One or more values are not valid numbers', category='error')     
+     
                 else:
                     flash('Please fill in all fields', category='error')
             else:
                 flash('High and low values can not be in between open and close values', category='error')
+
+            return redirect(url_for('views.home'))
 
     return render_template("home.html", user=current_user)
 
@@ -105,6 +109,7 @@ def delete_values():
 def stock():
     return render_template('stock.html', user = current_user)
 
+@login_required
 @views.route('/chart-data', methods=['GET'])
 def chart_data():
     open_values = OpenValue.query.filter_by(user_id=current_user.id).all()
@@ -128,3 +133,12 @@ def chart_data():
         })
 
     return jsonify(data)
+
+@login_required
+@views.route('/chart-name', methods=['GET'])
+def chart_name():
+    notes = Note.query.filter_by(user_id=current_user.id).all()
+
+    notes_data = [note.data for note in notes]
+
+    return jsonify(notes_data)

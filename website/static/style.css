@@ -1,8 +1,7 @@
 body {
     background-color: #242526;
 }
-
-h1 {
+h3 {
     color: #E4E6EB;
 }
 
@@ -25,4 +24,48 @@ text {
 
 #cross {
     color: #E4E6EB;
+}
+
+.text-muted {
+    font-size: 10px;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #ffffff; 
+}
+.navbar-light .navbar-toggler-icon {
+    background-image: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="none" viewBox="0 0 30 30"><path stroke="%23ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h20M5 15h20M5 23h20"/></svg>'); /* White menu icon */
+}
+.navbar-nav .nav-link.active {
+    background-color: #495057; 
+    border-radius: 0.25rem; 
+}
+
+#chart {
+    width: 100%;
+    height: auto; 
+  }
+  
+
+@media (max-width: 768px) { 
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#chart {
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    width: 100vw; 
+    height: 100vh;
+    box-sizing: border-box; 
+    overflow: hidden; 
+    transform: rotate(90deg);
+}
+}
+
+#SvgjsTspan1010 {
+    font-size: 15px;
 }
