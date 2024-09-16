@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Note, CloseValue, OpenValue, High, Low
+from .models import Note, CloseValue, OpenValue, High, Low, OpenValue2, OpenValue3, CloseValue2, CloseValue3, Drink, Drink2
 from . import db
 import json
 
@@ -18,46 +18,105 @@ def home():
                     new_note = Note(data=note, user_id=current_user.id)
                     db.session.add(new_note)
                     db.session.commit()
-                    flash('Note added!', category='success')
+                    flash('Drink added!', category='success')
                 else:
-                    flash('Value insert requires at least 1 character')
+                    flash('Value requires at least 1 character')
         
                 return redirect(url_for('views.home'))
             
         if form_type == 'values_form':
             open_v = request.form.get('open_v')
             close = request.form.get('close')
-            high = request.form.get('high')
-            low = request.form.get('low')
-            if not (min(open_v, close) <= high <= max(open_v, close)) and not (min(open_v, close) <= low <= max(open_v, close)):
-                if open_v and close and high and low:
-                    try:
-                        open_value = float(open_v)
-                        close_value = float(close)
-                        high_value = float(high)
-                        low_value = float(low)
 
-                        new_open_value = OpenValue(data=open_value, user_id=current_user.id)               
-                        new_close_value = CloseValue(data=close_value, user_id=current_user.id)
-                        new_high_value = High(data=high_value, user_id=current_user.id)
-                        new_low_value = Low(data=low_value, user_id=current_user.id)
+            if open_v and close:
+                try:
+                    open_value = float(open_v)
+                    close_value = float(close)
 
-                        db.session.add(new_open_value)
-                        db.session.add(new_close_value)
-                        db.session.add(new_high_value)
-                        db.session.add(new_low_value)
-                        db.session.commit()
-                            
-                        flash('Values added successfully!', category='success')
-                    except ValueError:
-                        flash('One or more values are not valid numbers', category='error')     
-     
-                else:
-                    flash('Please fill in all fields', category='error')
+                    new_open_value = OpenValue(data=open_value, user_id=current_user.id)               
+                    new_close_value = CloseValue(data=close_value, user_id=current_user.id)
+
+                    db.session.add(new_open_value)
+                    db.session.add(new_close_value)
+
+                    db.session.commit()
+                        
+                    flash('Values added successfully!', category='success')
+                except ValueError:
+                    flash('One or more values are not valid numbers', category='error')          
+    
             else:
-                flash('High and low values can not be in between open and close values', category='error')
+                flash('Please fill in all fields', category='error')
 
-            return redirect(url_for('views.home'))
+        if form_type == 'drink_form':
+            drink = request.form.get('drink')
+            if drink:
+                if len(note) > 0:
+                    new_drink = Drink(data=drink, user_id=current_user.id)
+                    db.session.add(new_drink)
+                    db.session.commit()
+                    flash('Drink added!', category='success')
+                else:
+                    flash('Value insert requires at least 1 character')
+        
+                return redirect(url_for('views.home'))
+            
+
+        if form_type == 'values_form2':
+            open_v2 = request.form.get('open_v2')
+            close2 = request.form.get('close2')
+
+            if open_v2 and close2:
+                try:
+                    open_v2 = open_v2(float)
+                    close2 = close2(float)
+
+                    new_open_value2 = OpenValue2(data=open_v2, user=current_user.id)
+                    new_close_value2 = CloseValue2(data=close2, user=current_user.id)
+
+                    db.session.add(new_open_value2)
+                    db.session.add(new_close_value2)
+                    db.session.commit()
+
+                except ValueError:
+                    flash('One or more values are not valid numbers', category='error')     
+            else:
+                flash("Please fill in all fields", category='error')  
+
+        if form_type == 'drink_form2':
+            drink2 = request.form.get('drink2')
+            if drink2:
+                if len(note) > 0:
+                    new_drink2 = Drink2(data=drink2, user_id=current_user.id)
+                    db.session.add(new_drink2)
+                    db.session.commit()
+                    flash('Drink added!', category='success')
+                else:
+                    flash('Value insert requires at least 1 character')
+        
+                return redirect(url_for('views.home'))   
+
+        if form_type == 'values_form3':
+            open_v3 = request.form.get('open_v3')
+            close3 = request.form.get('close3')
+
+            if open_v3 and close3:
+                try:
+                    open_v3 = open_v3(float)
+                    close3 = close3(float)
+
+                    new_open_value3 = OpenValue2(data=open_v3, user=current_user.id)
+                    new_close_value3 = CloseValue2(data=close3, user=current_user.id)
+
+                    db.session.add(new_open_value3)
+                    db.session.add(new_close_value3)
+                    db.session.commit()
+
+                except ValueError:
+                    flash('One or more values are not valid numbers', category='error')     
+            else:
+                flash("Please fill in all fields", category='error')  
+
 
     return render_template("home.html", user=current_user)
 
@@ -113,12 +172,9 @@ def stock():
 @views.route('/chart-data', methods=['GET'])
 def chart_data():
     open_values = OpenValue.query.filter_by(user_id=current_user.id).all()
-    high_values = High.query.filter_by(user_id=current_user.id).all()
-    low_values = Low.query.filter_by(user_id=current_user.id).all()
     close_values = CloseValue.query.filter_by(user_id=current_user.id).all()
 
-
-    num_values = min(len(open_values), len(high_values), len(low_values), len(close_values))
+    num_values = min(len(open_values), len(close_values))
 
     data = []
     for i in range(num_values):
@@ -126,9 +182,9 @@ def chart_data():
             'x': int(close_values[i].date.timestamp() * 1000),  
             'y': [
                 open_values[i].data,
-                high_values[i].data,
-                low_values[i].data,
-                close_values[i].data
+                open_values[i].data,
+                close_values[i].data,
+                close_values[i].data,
             ]
         })
 
