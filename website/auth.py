@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User
-from werkzeug.security import generate_password_hash, check_password_hash
 import bcrypt
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
@@ -23,8 +22,7 @@ def login():
                 flash('Incorrect password', category='error')
         else:
             flash('That email does not exist', category='error')
-
-    data = request.form
+            
     return render_template("login.html", user=current_user)
 
 @auth.route('/logout')
@@ -55,8 +53,9 @@ def signup():
             new_user = User(email=email, first_name=first_name, password=hashed_password.decode('utf-8'))
             db.session.add(new_user)
             db.session.commit()
-            login_user(user, remember=True)
+            login_user(new_user, remember=True)
             flash("Account created", category="success")
+
             return redirect(url_for('views.home'))
         
         def verify_user_password(stored_hash, password):

@@ -15,13 +15,13 @@
 
 <form method="POST" class="mb-4">
   <input name="note" id="note" class="form-control mb-2" placeholder="Add new drink..." required>
+  <br />
   <div class="d-flex justify-content-center">
     <button type="submit" class="btn btn-primary">Add drink name</button>
     <input type="hidden" name="form_type" value="note_form">
   </div>
 </form>
 
-<br/>
 
 <form method="POST">
 <h3 align="center">Values 1</h3>
@@ -30,10 +30,10 @@
   <div class="col">
     <h3 align="center">Open values</h3>
     <ul class="list-group list-group-flush" id="open_values">
-      {% for open_v in user.open_values %}
+      {% for open_v, close in zip(user.open_values, user.close_values) %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <span>{{ open_v.data }} <small class="text-muted">{{ open_v.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-        <button type="button" class="close" data-id="{{ open_v.id }}" onClick="deleteLastValues()">
+        <button type="button" class="close" data-id-open="{{ open_v.id }}" data-id-close="{{ close.id }}" onClick="deleteChart1Values({{ open_v.id }}, {{ close.id }})">
             <span aria-hidden="true" id="cross">&times;</span>
         </button>
       </li>
@@ -45,10 +45,10 @@
   <div class="col">
     <h3 align="center">Close values</h3>
     <ul class="list-group list-group-flush" id="close_values">
-      {% for close in user.close_values %}
+      {% for open_v, close in zip(user.open_values, user.close_values) %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <span>{{ close.data }} <small class="text-muted">{{ close.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-        <button type="button" class="close" data-id="{{ close.id }}" onClick="deleteLastValues()">
+        <button type="button" class="close" data-id-open="{{ open_v.id }}" data-id-close="{{ close.id }}" onClick="deleteChart1Values({{ open_v.id }}, {{ close.id }})">
             <span aria-hidden="true" id="cross">&times;</span>
         </button>
       </li>
@@ -66,11 +66,78 @@
 <br/>
 
 <h3 align="center">Drink name 2</h3>
-<ul class="list-group list-group-flush" id="notes">
-  {% for note in user.notes %}
+<ul class="list-group list-group-flush" id="drinks">
+  {% for drink in user.drinks %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
-    <span>{{ note.data }} <small class="text-muted">{{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+    <span>{{ drink.data }} <small class="text-muted">{{ drink.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+    <button type="button" class="close" onClick="deleteDrink({{ drink.id }})">
+        <span aria-hidden="true" id="cross">&times;</span>
+    </button>
+  </li>
+  {% endfor %}
+</ul>
+
+
+<form method="POST" class="mb-4">
+  <input name="drink" id="drink" class="form-control mb-2" placeholder="Add new drink..." required>
+  <br />
+  <div class="d-flex justify-content-center">
+    <button type="submit" class="btn btn-primary">Add drink name</button>
+    <input type="hidden" name="form_type" value="drink_form">
+  </div>
+</form>
+<form method="POST">
+  <h3 align="center">Values 2</h3>
+  
+  <div class="row">
+    <div class="col">
+      <h3 align="center">Open values</h3>
+      <ul class="list-group list-group-flush" id="open_values2">
+        {% for open_v2, close2 in zip(user.open_values2, user.close_values2) %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ open_v2.data }} <small class="text-muted">{{ open_v2.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+          <button type="button" class="close" data-id-open="{{ open_v2.id }}" data-id-close="{{ close2.id }}" onClick="deleteChart2Values({{ open_v2.id }}, {{ close2.id }})">
+              <span aria-hidden="true" id="cross">&times;</span>
+          </button>
+        </li>
+        {% endfor %}
+      </ul>
+      <input name="open_v2" id="open_v2" class="form-control mb-3" placeholder="Add open value..." required>
+    </div>
+  
+    <div class="col">
+      <h3 align="center">Close values</h3>
+      <ul class="list-group list-group-flush" id="close_values2">
+        {% for open_v2, close2 in zip(user.open_values2, user.close_values2) %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ close2.data }} <small class="text-muted">{{ close2.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+          <button type="button" class="close" data-id-open="{{ open_v2.id }}" data-id-close="{{ close2.id }}" onClick="deleteChart2Values({{ open_v2.id }}, {{ close2.id }})">
+              <span aria-hidden="true" id="cross">&times;</span>
+          </button>
+        </li>
+        {% endfor %}
+      </ul>
+      <input name="close2" id="close2" class="form-control mb-3" placeholder="Add close value..." required>
+    </div>
+  </div>
+
+<div class="d-flex justify-content-center mt-3">
+  <button type="submit" class="btn btn-primary">Add values</button>
+</div>
+<input type="hidden" name="form_type" value="values_form2">
+</form>
+
+<br/>
+
+<h3 align="center">Drink name 3</h3>
+
+<ul class="list-group list-group-flush" id="drinks2">
+  {% for drink2 in user.drinks2 %}
+  <li class="list-group-item d-flex justify-content-between align-items-center" id="drink-{{ drink2.id }}">
+    <span>{{ drink2.data }} 
+      <small class="text-muted">{{ drink2.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+    </span>
+    <button type="button" class="close" onClick="deleteDrink2({{ drink2.id }})">
         <span aria-hidden="true" id="cross">&times;</span>
     </button>
   </li>
@@ -78,76 +145,14 @@
 </ul>
 
 <form method="POST" class="mb-4">
-  <input name="note" id="note" class="form-control mb-2" placeholder="Add new drink..." required>
+  <input name="drink2" id="drink2" class="form-control mb-2" placeholder="Add new drink..." required>
+  <br />
   <div class="d-flex justify-content-center">
     <button type="submit" class="btn btn-primary">Add drink name</button>
-    <input type="hidden" name="form_type" value="note_form">
+    <input type="hidden" name="form_type" value="drink_form2">
   </div>
 </form>
 
-<form method="POST">
-  <h3 align="center">Values 2</h3>
-  
-  <div class="row">
-    <div class="col">
-      <h3 align="center">Open values</h3>
-      <ul class="list-group list-group-flush" id="open_values">
-        {% for open_v in user.open_values %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ open_v.data }} <small class="text-muted">{{ open_v.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-          <button type="button" class="close" data-id="{{ open_v.id }}" onClick="deleteLastValues()">
-              <span aria-hidden="true" id="cross">&times;</span>
-          </button>
-        </li>
-        {% endfor %}
-      </ul>
-      <input name="open_v" id="open_v" class="form-control mb-3" placeholder="Add open value..." required>
-    </div>
-  
-    <div class="col">
-      <h3 align="center">Close values</h3>
-      <ul class="list-group list-group-flush" id="close_values">
-        {% for close in user.close_values %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ close.data }} <small class="text-muted">{{ close.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-          <button type="button" class="close" data-id="{{ close.id }}" onClick="deleteLastValues()">
-              <span aria-hidden="true" id="cross">&times;</span>
-          </button>
-        </li>
-        {% endfor %}
-      </ul>
-      <input name="close" id="close" class="form-control mb-3" placeholder="Add close value..." required>
-    </div>
-  </div>
-
-<div class="d-flex justify-content-center mt-3">
-  <button type="submit" class="btn btn-primary">Add values</button>
-</div>
-<input type="hidden" name="form_type" value="values_form">
-</form>
-
-<br/>
-
-<h3 align="center">Drink name 3</h3>
-  <ul class="list-group list-group-flush" id="notes">
-    {% for note in user.notes %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <span>{{ note.data }} <small class="text-muted">{{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-      <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-          <span aria-hidden="true" id="cross">&times;</span>
-      </button>
-    </li>
-    {% endfor %}
-  </ul>  
-
-
-<form method="POST" class="mb-4">
-  <input name="note" id="note" class="form-control mb-2" placeholder="Add new drink..." required>
-  <div class="d-flex justify-content-center">
-    <button type="submit" class="btn btn-primary">Add drink name</button>
-    <input type="hidden" name="form_type" value="note_form">
-  </div>
-</form>
 
 <form method="POST">
   <h3 align="center">Values 3</h3>
@@ -155,40 +160,42 @@
   <div class="row">
     <div class="col">
       <h3 align="center">Open values</h3>
-      <ul class="list-group list-group-flush" id="open_values">
-        {% for open_v in user.open_values %}
+      <ul class="list-group list-group-flush" id="open_values3">
+        {% for open_v3, close3 in zip(user.open_values3, user.close_values3) %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ open_v.data }} <small class="text-muted">{{ open_v.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-          <button type="button" class="close" data-id="{{ open_v.id }}" onClick="deleteLastValues()">
+          <span>{{ open_v3.data }} <small class="text-muted">{{ open_v3.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+          <button type="button" class="close" data-id-open="{{ open_v3.id }}" data-id-close="{{ close3.id }}" onClick="deleteChart3Values({{ open_v3.id }}, {{ close3.id }})">
               <span aria-hidden="true" id="cross">&times;</span>
           </button>
         </li>
         {% endfor %}
       </ul>
-      <input name="open_v" id="open_v" class="form-control mb-3" placeholder="Add open value..." required>
+      <input name="open_v3" id="open_v3" class="form-control mb-3" placeholder="Add open value..." required>
     </div>
   
     <div class="col">
       <h3 align="center">Close values</h3>
-      <ul class="list-group list-group-flush" id="close_values">
-        {% for close in user.close_values %}
+      <ul class="list-group list-group-flush" id="close_values3">
+        {% for open_v3, close3 in zip(user.open_values3, user.close_values3) %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ close.data }} <small class="text-muted">{{ close.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
-          <button type="button" class="close" data-id="{{ close.id }}" onClick="deleteLastValues()">
+          <span>{{ close3.data }} <small class="text-muted">{{ close3.date.strftime('%Y-%m-%d %H:%M:%S') }}</small></span>
+          <button type="button" class="close" data-id-open="{{ open_v3.id }}" data-id-close="{{ close3.id }}" onClick="deleteChart3Values({{ open_v3.id }}, {{ close3.id }})">
               <span aria-hidden="true" id="cross">&times;</span>
           </button>
         </li>
         {% endfor %}
       </ul>
-      <input name="close" id="close" class="form-control mb-3" placeholder="Add close value..." required>
+      <input name="close3" id="close3" class="form-control mb-3" placeholder="Add close value..." required>
     </div>
   </div>
     
 <div class="d-flex justify-content-center mt-3">
   <button type="submit" class="btn btn-primary">Add values</button>
 </div>
-<input type="hidden" name="form_type" value="values_form">
+<input type="hidden" name="form_type" value="values_form3">
 </form>
+
+<br />
 
 {% endblock %}
 

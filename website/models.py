@@ -31,18 +31,6 @@ class OpenValue(db.Model):
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-class High(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float)
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-class Low(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Float)
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
 class OpenValue2(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.Float)
@@ -73,10 +61,10 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     notes = db.relationship('Note')
+    drinks = db.relationship('Drink')
+    drinks2 = db.relationship('Drink2')
     close_values = db.relationship('CloseValue')
     open_values = db.relationship('OpenValue')
-    highs = db.relationship('High')
-    lows = db.relationship('Low')
     open_values2 = db.relationship('OpenValue2')
     close_values2 = db.relationship('CloseValue2')
     open_values3 = db.relationship('OpenValue3')

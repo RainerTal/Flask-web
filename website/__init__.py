@@ -21,7 +21,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User, Note, CloseValue, OpenValue, High, Low
+    from .models import User, Note, OpenValue, CloseValue, Drink, OpenValue2, CloseValue2, Drink2, CloseValue3, OpenValue3
     
     with app.app_context():
         db.create_all()
