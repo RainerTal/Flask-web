@@ -66,3 +66,4 @@ def signup():
 @auth.route("/stock")
 def stock():
     return render_template("stock.html", user = current_user)
+
